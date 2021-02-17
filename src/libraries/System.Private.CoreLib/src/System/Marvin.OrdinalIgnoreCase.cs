@@ -48,10 +48,26 @@ namespace System
                     goto NotAscii;
                 }
 
-                // addition is written with -0x80u to allow fall-through to next statement rather than jmp past it
-                p0 += Utf16Utility.ConvertAllAsciiCharsInUInt32ToUppercase(tempValue) + (0x800000u - 0x80u);
+                if (BitConverter.IsLittleEndian)
+                {
+                    p0 += Utf16Utility.ConvertAllAsciiCharsInUInt32ToUppercase(tempValue) + 0x800000u;
+                }
+                else
+                {
+                    p0 += (Utf16Utility.ConvertAllAsciiCharsInUInt32ToUppercase(tempValue) << 16) + 0x8000u;
+                }
             }
-            p0 += 0x80u;
+            else
+            {
+                if (BitConverter.IsLittleEndian)
+                {
+                    p0 += 0x80u;
+                }
+                else
+                {
+                    p0 += 0x80000000u;
+                }
+            }
 
             Block(ref p0, ref p1);
             Block(ref p0, ref p1);

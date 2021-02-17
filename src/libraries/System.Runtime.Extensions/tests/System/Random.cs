@@ -414,6 +414,12 @@ namespace System.Tests
             Assert.NotNull(s2);
             Assert.NotNull(s3);
 
+            if (!BitConverter.IsLittleEndian)
+            {
+                // The remainder of the test expects specific result values that will
+                // only happen on little-endian platforms.
+                return;
+            }
             if (IntPtr.Size == 8)
             {
                 // Example seeds from https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html
