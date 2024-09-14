@@ -704,7 +704,12 @@ FCIMPL4(Object*, RuntimeMethodHandle::InvokeMethod,
         // we have allocated for this purpose.
         else if (!fHasRetBuffArg)
         {
-            CopyValueClass(gc.retVal->GetData(), &callDescrData.returnValue, gc.retVal->GetMethodTable());
+            BYTE *retVal = (BYTE *)&callDescrData.returnValue;
+            MethodTable *pMT = gc.retVal->GetMethodTable();
+#ifdef BIGENDIAN
+            retVal += sizeof(callDescrData.returnValue) - pMT->GetNumInstanceFieldBytes();
+#endif
+            CopyValueClass(gc.retVal->GetData(), retVal, pMT);
         }
         // From here on out, it is OK to have GCs since the return object (which may have had
         // GC pointers has been put into a GC object and thus protected.

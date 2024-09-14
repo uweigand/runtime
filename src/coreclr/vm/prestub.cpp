@@ -2560,7 +2560,7 @@ static PCODE PreStubWorker_Preemptive(
     _In_ MethodDesc* pMD,
     _In_opt_ Thread* currentThread)
 {
-    _ASSERTE(pMD->HasUnmanagedCallersOnlyAttribute());
+//    _ASSERTE(pMD->HasUnmanagedCallersOnlyAttribute());
 
     PCODE pbRetVal = (PCODE)NULL;
 

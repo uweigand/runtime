@@ -3,6 +3,8 @@
     <!-- Needed for CLRTestEnvironmentVariable and GCStressIncompatible -->
     <RequiresProcessIsolation>true</RequiresProcessIsolation>
     <GCStressIncompatible>true</GCStressIncompatible>
+    <!-- Interpreter-only stack overflow -->
+    <CLRTestTargetUnsupported Condition="'$(TargetArchitecture)' == 's390x'">true</CLRTestTargetUnsupported>
   </PropertyGroup>
   <PropertyGroup>
     <DebugType>PdbOnly</DebugType>
