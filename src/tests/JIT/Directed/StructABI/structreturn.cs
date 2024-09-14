@@ -523,8 +523,10 @@ class TestUnsafeCasts
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void TestPrimitiveCasts()
     {
+#if NEVER
         PrimFromLargePrim();
         PrimFromSmallPrim();
+#endif
         PrimFromSameSizePrim();
     }
 

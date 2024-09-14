@@ -559,6 +559,7 @@ struct InterpreterMethodInfo
 
     // Stub num for the current method under interpretation.
     int                         m_stubNum;
+    Stub*                       m_stub;
 
     // The method this info is relevant to.
     CORINFO_METHOD_HANDLE       m_method;
@@ -924,6 +925,8 @@ public:
         NI_System_Threading_Interlocked_CompareExchange,
         NI_System_Threading_Interlocked_Exchange,
         NI_System_Threading_Interlocked_ExchangeAdd,
+        NI_System_Threading_Interlocked_MemoryBarrier,
+        NI_System_Threading_Interlocked_ReadMemoryBarrier,
     };
     static InterpreterNamedIntrinsics getNamedIntrinsicID(CEEInfo* info, CORINFO_METHOD_HANDLE methodHnd);
     static const char* getMethodName(CEEInfo* info, CORINFO_METHOD_HANDLE hnd, const char** className, const char** namespaceName = NULL, const char **enclosingClassName = NULL);
@@ -1021,6 +1024,8 @@ private:
         static const int MaxNumFPRegArgSlots = 8;
 #elif defined(HOST_RISCV64)
         static const int MaxNumFPRegArgSlots = 8;
+#elif defined(HOST_S390X)
+        static const int MaxNumFPRegArgSlots = 4;
 #endif
 
         ~ArgState()
@@ -1118,6 +1123,15 @@ private:
             if (GetArgType(argNum).IsLargeStruct(&m_interpCeeInfo))
             {
                 return *reinterpret_cast<BYTE**>(&m_ilArgs[m_methInfo->m_argDescs[argNum].m_nativeOffset]);
+            }
+#elif defined(HOST_S390X)
+            if (GetArgType(argNum).IsStruct())
+            {
+                size_t size = GetArgType(argNum).Size(&m_interpCeeInfo);
+                if (size > 8 || (size & (size-1)) != 0)
+                {
+                    return *reinterpret_cast<BYTE**>(&m_ilArgs[m_methInfo->m_argDescs[argNum].m_nativeOffset]);
+                }
             }
 #endif
             return &m_ilArgs[m_methInfo->m_argDescs[argNum].m_nativeOffset];
@@ -2088,6 +2102,8 @@ unsigned short Interpreter::NumberOfIntegerRegArgs() { return 8; }
 unsigned short Interpreter::NumberOfIntegerRegArgs() { return 8; }
 #elif defined(HOST_RISCV64)
 unsigned short Interpreter::NumberOfIntegerRegArgs() { return 8; }
+#elif defined(HOST_S390X)
+unsigned short Interpreter::NumberOfIntegerRegArgs() { return 5; }
 #else
 #error Unsupported architecture.
 #endif

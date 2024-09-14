@@ -234,7 +234,7 @@ void InitializeExceptionHandling()
 
     g_theTrackerAllocator.Init();
 
-    g_isNewExceptionHandlingEnabled = Configuration::GetKnobBooleanValue(W("System.Runtime.LegacyExceptionHandling"), CLRConfig::EXTERNAL_LegacyExceptionHandling ) == 0;
+    g_isNewExceptionHandlingEnabled = false; // FIXME-S390 Configuration::GetKnobBooleanValue(W("System.Runtime.LegacyExceptionHandling"), CLRConfig::EXTERNAL_LegacyExceptionHandling ) == 0;
 
 #ifdef TARGET_UNIX
     // Register handler of hardware exceptions like null reference in PAL
@@ -7670,6 +7670,8 @@ UINT_PTR GetEstablisherFrame(REGDISPLAY* pvRegDisplay, ExInfo* exInfo)
     return pvRegDisplay->SP;
 #elif defined(HOST_LOONGARCH64)
     return pvRegDisplay->SP;
+#elif defined(HOST_S390X)
+    return pvRegDisplay->SP;
 #endif
 }
 
@@ -7891,6 +7893,8 @@ extern "C" void * QCALLTYPE CallCatchFunclet(QCall::ObjectHandleOnStack exceptio
 #define FIRST_ARG_REG R0
 #elif defined(HOST_RISCV64) || defined(HOST_LOONGARCH64)
 #define FIRST_ARG_REG A0
+#elif defined(HOST_S390X)
+#define FIRST_ARG_REG R2
 #endif
 
         pvRegDisplay->pCurrentContext->FIRST_ARG_REG = (size_t)OBJECTREFToObject(exceptionObj.Get());
